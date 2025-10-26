@@ -1,29 +1,26 @@
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api/axios";
 import { useState, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Login(){
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(""); // Clear any previous errors
-        setIsLoading(true);
-        
-        try {
-            const res = await api.post("/auth/login", {email, password});
-            const token = res.data.token;
-
-            localStorage.setItem("token", token);
-
+    const loginMutation = useMutation({
+        mutationFn: async (credentials: { email: string; password: string }) => {
+            const res = await api.post("/auth/login", credentials);
+            return res.data;
+        },
+        onSuccess: (data) => {
+            localStorage.setItem("token", data.token);
             navigate("/");
-        } catch (error: any) {
+        },
+        onError: (error: unknown) => {
             console.error("Login error:", error);
             setError("Invalid email or password. Please try again.");
             // Keep focus on the password field after error
@@ -32,9 +29,13 @@ export default function Login(){
                     passwordRef.current.focus();
                 }
             }, 100);
-        } finally {
-            setIsLoading(false);
         }
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(""); // Clear any previous errors
+        loginMutation.mutate({ email, password });
     }
 
     return(
@@ -75,14 +76,14 @@ export default function Login(){
                     
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={loginMutation.isPending}
                         className={`w-full py-3 px-4 rounded-2xl font-medium focus:ring-2 focus:ring-offset-2 transition-all duration-200 border-white border-1 ${
-                            isLoading 
+                            loginMutation.isPending 
                                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
                                 : 'bg-black text-white hover:bg-white hover:text-black cursor-pointer'
                         }`}
                     >
-                        {isLoading ? 'Signing In...' : 'Sign In'}
+                        {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
                     </button>
                 </form>
                 
