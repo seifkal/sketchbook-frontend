@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html, body {
+  @apply bg-neutral-900 min-h-screen;
+}
+
 @font-face {
   font-family: 'Pixeled';
   src: url('/fonts/Pixeled.ttf') format('truetype');
