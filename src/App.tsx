@@ -6,12 +6,14 @@ import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { PublicRoute } from "./routes/PublicRoute";
 import './App.css'
 import AppLayout from "./layouts/AppLayout";
-import PixelDrawer from "./components/PixelDrawer";
+import PixelDrawer from "./pages/Create/PixelDrawer";
 import Feed from "./pages/Feed";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
+        <BrowserRouter>
       <Routes>
         <Route
           path="/auth"
@@ -51,6 +53,8 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+    <ToastContainer position="bottom-right" autoClose={3000} theme="dark"/>
+    </>
   )
 }
 
