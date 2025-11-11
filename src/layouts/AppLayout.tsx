@@ -8,7 +8,6 @@ export default function AppLayout() {
         <div className="bg-neutral-900 text-neutral-100 min-h-screen pb-16">
             <div className="w-full px-4 h-20 border-b border-neutral-800 flex items-center justify-between bg-neutral-900 sticky top-0 z-40">
                 <Header />
-                {/* // Future: right-side controls here */}
             </div>
             <div className="flex min-h-[calc(100vh-80px)]">
                 {/* Left Sidebar: Navbar always visible on desktop/tablet */}
