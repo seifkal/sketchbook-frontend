@@ -125,7 +125,7 @@ export default function PixelDrawer() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 w-full">
+    <div className="flex flex-col lg:flex-row gap-4 w-full px-8">
       {/* 32x32 grid consitsting of divs that display the corresponding pixel color in the pixels array*/}
       <div 
         className="flex justify-center lg:justify-start overflow-auto pb-4 lg:pb-0 cursor-crosshair"

@@ -10,15 +10,12 @@ export default function AppLayout() {
                 <Header />
             </div>
             <div className="flex min-h-[calc(100vh-80px)]">
-                {/* Left Sidebar: Navbar always visible on desktop/tablet */}
                 <div className="hidden sm:flex w-1/5 min-w-[200px] border-r border-neutral-800 flex-col items-center px-4 py-8 gap-8">
                     <Navbar />
                 </div>
-                {/* Middle: Outlet - 60% scrollable */}
-                <div className="w-full sm:w-3/5 px-8 py-4 overflow-auto">
+                <div className="w-full sm:w-3/5 py-4 overflow-auto">
                     <Outlet />
                 </div>
-                {/* Right Sidebar - 20% (desktop only) */}
                 <div className="hidden sm:block w-1/5 min-w-[200px] border-l border-neutral-800 px-4 py-4">
                     <div className="h-full flex flex-col items-center justify-center opacity-60">
                       Sidebar

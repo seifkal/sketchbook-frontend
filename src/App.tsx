@@ -4,11 +4,11 @@ import Register from "./pages/Auth/Register";
 import Auth from "./pages/Auth/Auth";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { PublicRoute } from "./routes/PublicRoute";
-import './App.css'
 import AppLayout from "./layouts/AppLayout";
 import PixelDrawer from "./pages/Create/PixelDrawer";
 import Feed from "./pages/Feed";
 import { ToastContainer } from "react-toastify";
+import Settings from "./pages/Settings/Settings";
 
 function App() {
   return (
@@ -48,6 +48,7 @@ function App() {
             <>
               <Route index element={<Feed></Feed>} />
               <Route path="create" element={<PixelDrawer />} />
+              <Route path="settings" element={<Settings />} />
             </>
           }
         />
