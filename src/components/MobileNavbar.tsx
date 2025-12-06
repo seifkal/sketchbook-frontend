@@ -1,7 +1,9 @@
-import { Link} from "react-router-dom";
-import { navItems } from "./Navbar";
+import { Link } from "react-router-dom";
+import { useNavItems } from "./Navbar";
 
 export default function MobileNavbar() {
+    const navItems = useNavItems();
+
     return (
         <nav className="fixed bottom-0 left-0 w-full z-40 bg-neutral-900 border-t border-neutral-800 flex sm:hidden justify-between px-2 pb-safe pt-1">
             {navItems.map(({ to, icon, label }) => (
