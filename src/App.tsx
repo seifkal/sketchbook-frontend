@@ -6,55 +6,68 @@ import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { PublicRoute } from "./routes/PublicRoute";
 import AppLayout from "./layouts/AppLayout";
 import PixelDrawer from "./pages/Create/PixelDrawer";
-import Feed from "./pages/Feed";
 import { ToastContainer } from "react-toastify";
 import Settings from "./pages/Settings/Settings";
+import Profile from "./pages/Users/Profile";
+import HomeFeed from "./pages/Feed/HomeFeed";
+import LikesFeed from "./pages/Feed/LikesFeed";
+import { useContext } from "react";
+import UserContext from "./context/UserContext";
 
 function App() {
+
+  const userContext = useContext(UserContext);
+
+  const userClaims = userContext?.user;
+
+  const id = userClaims?.userId.toString();
+
   return (
     <>
-        <BrowserRouter>
-      <Routes>
-        <Route
-          path="/auth"
-          element={<Auth />}
-        >
-          <Route index element={<Navigate to="/auth/login" replace />} />
+      <BrowserRouter>
+        <Routes>
           <Route
-            path="login"
+            path="/auth"
+            element={<Auth />}
+          >
+            <Route index element={<Navigate to="/auth/login" replace />} />
+            <Route
+              path="login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="register"
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              }
+            />
+          </Route>
+          <Route
+            path="/"
             element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+            children={
+              <>
+                <Route index element={<HomeFeed />} />
+                <Route path="create" element={<PixelDrawer />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="users/:id" element={<Profile />} />
+                <Route path="likes" element={<LikesFeed id={id} />} />
+              </>
             }
           />
-          <Route
-            path="register"
-            element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            }
-          />
-        </Route>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <AppLayout />
-            </ProtectedRoute>
-          }
-          children={
-            <>
-              <Route index element={<Feed></Feed>} />
-              <Route path="create" element={<PixelDrawer />} />
-              <Route path="settings" element={<Settings />} />
-            </>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-    <ToastContainer position="bottom-right" autoClose={3000} theme="dark"/>
+        </Routes>
+      </BrowserRouter>
+      <ToastContainer position="bottom-right" autoClose={3000} theme="dark" />
     </>
   )
 }
