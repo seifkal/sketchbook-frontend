@@ -4,6 +4,8 @@ import { jwtDecode } from "jwt-decode";
 interface JwtPayload {
     userId: number;
     username: string;
+    avatarColors?: string[];
+    avatarVariant?: "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus";
 }
 
 interface UserContextType {
