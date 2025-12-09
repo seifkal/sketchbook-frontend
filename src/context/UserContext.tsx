@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
@@ -9,12 +9,14 @@ interface JwtPayload {
 interface UserContextType {
     user: JwtPayload | null;
     setUser: React.Dispatch<React.SetStateAction<JwtPayload | null>>;
+    isLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<JwtPayload | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -27,11 +29,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 setUser(null);
             }
         }
+        setIsLoading(false);
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, isLoading }}>
             {children}
         </UserContext.Provider>
     );
 };
+
+export const useUser = (): UserContextType => {
+    const context = useContext(UserContext);
+    if (context === null) {
+        throw new Error("useUser must be used within a UserProvider");
+    }
+    return context;
+};
+
+export default UserContext;
+

@@ -1,19 +1,21 @@
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 
 export default function Settings() {
-
+    const { setUser } = useUser();
     const navigate = useNavigate();
 
     const handleLogout = () => {
         localStorage.removeItem("token");
+        setUser(null);
         navigate("/auth");
     }
 
     return (
         <div className="p-0">
             <div className="w-full border-b border-neutral-800 h-12 flex flex-row pl-8 gap-8 items-center pb-4">
-                <button onClick={()=>navigate(-1)} className="w-8 h-8 rounded-2xl hover:bg-neutral-700 flex justify-center items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tabler-icon tabler-icon-arrow-left"><path d="M5 12l14 0"></path><path d="M5 12l6 6"></path><path d="M5 12l6 -6"></path></svg>
+                <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-2xl hover:bg-neutral-700 flex justify-center items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tabler-icon tabler-icon-arrow-left"><path d="M5 12l14 0"></path><path d="M5 12l6 6"></path><path d="M5 12l6 -6"></path></svg>
                 </button>
                 <p className="font-bold text-neutral-50">Settings</p>
             </div>

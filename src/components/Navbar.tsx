@@ -1,11 +1,9 @@
-import { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { House } from "lucide-react";
-import UserContext from "../context/UserContext";
+import { useUser } from "../context/UserContext";
 
 export function useNavItems() {
-    const userContext = useContext(UserContext);
-    const user = userContext?.user;
+    const { user } = useUser();
 
     return [
         {
@@ -24,7 +22,7 @@ export function useNavItems() {
             )
         },
         {
-            to: user ? `/users/${user.userId}` : "/login", label: "Profile", icon: (
+            to: user?.userId ? `/users/${user.userId}` : "/auth/login", label: "Profile", icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 8 1.29 8 3.84V20H4v-4.16C4 13.29 9.3 12 12 12zm0-2a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" /></svg>
             )
         },
