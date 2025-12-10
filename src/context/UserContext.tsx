@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-interface JwtPayload {
+export interface JwtPayload {
     userId: number;
     username: string;
     avatarColors?: string[];

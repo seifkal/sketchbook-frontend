@@ -2,13 +2,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { api } from "../../api/axios";
 import { useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useUser } from "../../context/UserContext";
+import { useUser, type JwtPayload } from "../../context/UserContext";
 import { jwtDecode } from "jwt-decode";
-
-interface JwtPayload {
-    userId: number;
-    username: string;
-}
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -75,6 +70,7 @@ export default function Login() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-5 py-3.5 bg-neutral-800/50 border border-neutral-700 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all duration-200 placeholder-neutral-500 text-white"
                                 placeholder="Email address"
+                                autoComplete="email"
                                 required
                             />
                         </div>
@@ -87,6 +83,7 @@ export default function Login() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-5 py-3.5 bg-neutral-800/50 border border-neutral-700 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all duration-200 placeholder-neutral-500 text-white"
                                 placeholder="Password"
+                                autoComplete="current-password"
                                 required
                             />
                         </div>
