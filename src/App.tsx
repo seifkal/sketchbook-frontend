@@ -13,6 +13,7 @@ import HomeFeed from "./pages/Feed/HomeFeed";
 import LikesFeed from "./pages/Feed/LikesFeed";
 import { useContext } from "react";
 import UserContext from "./context/UserContext";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route
             path="/auth"
