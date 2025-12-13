@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
-html, body {
+@theme {
+  --color-neutral-900: #121212;
+  --font-pixeled: 'Pixeled', sans-serif;
+}
+
+html,
+body {
   @apply bg-neutral-900 min-h-screen;
 }
 
@@ -29,10 +35,17 @@ html, body {
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
+}
+
+.image-render-pixel {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
