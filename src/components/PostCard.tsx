@@ -7,6 +7,7 @@ import { useState } from "react";
 import { api } from "../api/axios";
 import { useMutation } from "@tanstack/react-query";
 import type { Post } from "./PostList";
+import { Link } from "react-router-dom";
 
 TimeAgo.addLocale(en)
 
@@ -30,8 +31,10 @@ export default function PostCard({ post }: { post: Post }) {
     return (
         <button className="flex justify-center items-center w-full hover:bg-neutral-800 cursor-pointer flex-col p-6">
             <div className="flex w-full gap-2">
-                <Avatar name={post.authorUsername} colors={post.authorAvatarColors} variant={post.authorAvatarVariant} size={40} />
-                <div className="flex justify-center items-center">{post.authorUsername}</div>
+                <Link to={`/users/${post.authorId}`} onClick={(e) => e.stopPropagation()} className="flex gap-2 items-center">
+                    <Avatar name={post.authorUsername} colors={post.authorAvatarColors} variant={post.authorAvatarVariant} size={40} />
+                    <div className="flex justify-center items-center">{post.authorUsername}</div>
+                </Link>
                 <ReactTimeAgo date={new Date(post.createdAt)} className="flex justify-center items-center text-neutral-500" />
             </div>
             <div className="w-full flex py-4">{post.title}</div>
