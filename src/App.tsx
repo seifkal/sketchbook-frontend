@@ -9,11 +9,11 @@ import PixelDrawer from "./pages/Create/PixelDrawer";
 import { ToastContainer } from "react-toastify";
 import Settings from "./pages/Settings/Settings";
 import Profile from "./pages/Users/Profile";
-import HomeFeed from "./pages/Feed/HomeFeed";
 import LikesFeed from "./pages/Feed/LikesFeed";
 import { useContext } from "react";
 import UserContext from "./context/UserContext";
 import ScrollToTop from "./components/ScrollToTop";
+import Home from "./pages/Home/Home";
 
 function App() {
 
@@ -59,7 +59,7 @@ function App() {
             }
             children={
               <>
-                <Route index element={<HomeFeed />} />
+                <Route index element={<Home />} />
                 <Route path="create" element={<PixelDrawer />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="users/:id" element={<Profile />} />
