@@ -1,5 +1,5 @@
 import PostCard from "./PostCard";
-type AvatarVariant = "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus" | undefined;
+export type AvatarVariant = "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus" | undefined;
 
 export interface Post {
     id: string;

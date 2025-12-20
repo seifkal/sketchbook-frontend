@@ -14,6 +14,7 @@ import { useContext } from "react";
 import UserContext from "./context/UserContext";
 import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/Home/Home";
+import PostPage from "./pages/Posts/PostPage";
 
 function App() {
 
@@ -64,6 +65,7 @@ function App() {
                 <Route path="settings" element={<Settings />} />
                 <Route path="users/:id" element={<Profile />} />
                 <Route path="likes" element={<LikesFeed id={id} />} />
+                <Route path="posts/:id" element={<PostPage />} />
               </>
             }
           />
