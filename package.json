@@ -16,6 +16,7 @@
     "boring-avatars": "^2.0.4",
     "fslightbox-react": "^2.0.0",
     "javascript-time-ago": "^2.5.12",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.554.0",
     "react": "^19.1.1",
     "react-colorful": "^5.6.1",
