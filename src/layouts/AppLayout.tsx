@@ -1,26 +1,30 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Header from "../components/Header";
 import MobileNavbar from "../components/MobileNavbar";
+import Sidebar from "../components/Sidebar";
 
 export default function AppLayout() {
+    const location = useLocation();
+    const isCreatePage = location.pathname === "/create";
+
     return (
         <div className="bg-neutral-900 text-neutral-100 min-h-screen pb-16">
             <div className="w-full px-4 h-20 border-b border-neutral-800 flex items-center justify-between bg-neutral-900 sticky top-0 z-40">
                 <Header />
             </div>
             <div className="flex min-h-[calc(100vh-80px)]">
-                <div className="hidden sm:flex w-1/5 min-w-[200px] border-r border-neutral-800 flex-col items-center px-4 py-8 gap-8">
+                <div className="hidden sm:flex w-1/3 min-w-[200px] border-r border-neutral-800 flex-col items-center px-4 gap-8">
                     <Navbar />
                 </div>
-                <div className="w-full sm:w-3/5 py-4 overflow-auto">
+                <div className={`w-full ${isCreatePage ? 'sm:w-4/5' : 'sm:w-3/5'} overflow-auto`}>
                     <Outlet />
                 </div>
-                <div className="hidden sm:block w-1/5 min-w-[200px] border-l border-neutral-800 px-4 py-4">
-                    <div className="h-full flex flex-col items-center justify-center opacity-60">
-                      Sidebar
+                {!isCreatePage && (
+                    <div className="hidden sm:block w-1/3 min-w-[200px] border-l border-neutral-800 px-4 py-4">
+                        <Sidebar />
                     </div>
-                </div>
+                )}
             </div>
             <MobileNavbar />
         </div>
