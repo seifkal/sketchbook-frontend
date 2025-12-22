@@ -1,250 +1,279 @@
 import { useMutation } from "@tanstack/react-query";
-import { useState, type FormEvent } from "react";
+import { useState, useRef, useEffect, memo, type FormEvent } from "react";
 import { HexColorPicker } from "react-colorful";
 import { api } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Grid3x3, Trash2 } from "lucide-react";
 
-interface postPayload{
+interface postPayload {
   title: string;
   pixelData: string[][];
 }
 
+// Memoized pixel component - only re-renders when its color or showGrid changes
+const Pixel = memo(function Pixel({
+  color,
+  size,
+  showGrid
+}: {
+  color: string;
+  size: number;
+  showGrid: boolean;
+}) {
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: color,
+        boxShadow: showGrid ? "inset 0 0 0 0.5px rgba(0,0,0,0.2)" : "none",
+      }}
+    />
+  );
+});
+
 export default function PixelDrawer() {
   const size = 32;
+  const pixelSize = 14;
 
-  const [color, setColor] = useState("#000000")
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [border, setBorder] = useState(true);
+  const [color, setColor] = useState("#000000");
+  const [showGrid, setShowGrid] = useState(false);
   const [description, setDescription] = useState("");
-  const navigate = useNavigate();
+  const [showColorPicker, setShowColorPicker] = useState(false);
 
-  const [pixels, setPixels] = useState<string[][]>(
-    // 32x32 array that contains the color of each pixel
-    () => Array.from({ length: size }, () => Array<string>(size).fill("#ffffff"))
+  const navigate = useNavigate();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Use refs for drawing state (synchronous updates during drag)
+  const isDrawingRef = useRef(false);
+  const prevPixelRef = useRef<{ row: number; col: number } | null>(null);
+  const colorRef = useRef(color);
+
+  // Keep colorRef in sync
+  useEffect(() => {
+    colorRef.current = color;
+  }, [color]);
+
+  const [pixels, setPixels] = useState<string[][]>(() =>
+    Array.from({ length: size }, () => Array<string>(size).fill("#ffffff"))
   );
-  const hasContent = pixels.some(row => row.some(pixel => pixel !== "#ffffff"));
+
+  const hasContent = pixels.some((row) => row.some((pixel) => pixel !== "#ffffff"));
+
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
 
   const submitMutation = useMutation({
     mutationFn: async (postData: postPayload) => {
       const res = await api.post("/posts", postData);
-      return res.data
+      return res.data;
     },
-    onSuccess: () => {
-      navigate("/");
-    },
-    onError: (error: unknown) => {
-      console.error(error);
-    }
-  })
+    onSuccess: () => navigate("/"),
+    onError: (error: unknown) => console.error(error),
+  });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if(!hasContent){
-      toast.error("Canvas is empty! Draw something")
+    if (!hasContent) {
+      toast.error("Canvas is empty! Draw something");
       return;
     }
-
-    if(!description.trim()){
+    if (!description.trim()) {
       toast.error("Please write a description for your post");
       return;
     }
-
-    const payload: postPayload = {
-      title: description.trim(),
-      pixelData: pixels,
-    }
-
-    submitMutation.mutate(payload);
-
+    submitMutation.mutate({ title: description.trim(), pixelData: pixels });
   };
 
-  const handleClick = (x: number, y: number) => {
+  // Bresenham's line algorithm - draws all pixels between two points
+  const drawLine = (r0: number, c0: number, r1: number, c1: number, paintColor: string) => {
+    const dr = Math.abs(r1 - r0);
+    const dc = Math.abs(c1 - c0);
+    const sr = r0 < r1 ? 1 : -1;
+    const sc = c0 < c1 ? 1 : -1;
+    let err = dr - dc;
+
     setPixels((prev) => {
-      const next = [...prev];
-      next[x][y] = color;
+      const next = prev.map((r) => [...r]);
+      let x = r0, y = c0;
+
+      while (true) {
+        if (x >= 0 && x < size && y >= 0 && y < size) {
+          next[x][y] = paintColor;
+        }
+        if (x === r1 && y === c1) break;
+        const e2 = err * 2;
+        if (e2 > -dc) { err -= dc; x += sr; }
+        if (e2 < dr) { err += dr; y += sc; }
+      }
       return next;
-    })
-  }
+    });
+  };
 
-  const handleMouseDown = (x: number, y: number) => {
-    setIsDrawing(true);
-    handleClick(x, y);
-  }
+  // Get pixel coordinates from mouse/touch position
+  const getPixelFromEvent = (e: React.MouseEvent | React.TouchEvent) => {
+    const grid = gridRef.current;
+    if (!grid) return null;
 
-  const handleMouseEnter = (x: number, y: number) => {
-    if (isDrawing) {
-      handleClick(x, y);
+    const rect = grid.getBoundingClientRect();
+    let clientX: number, clientY: number;
+
+    if ("touches" in e && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if ("clientX" in e) {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    } else {
+      return null;
     }
-  }
 
-  const handleMouseUp = () => {
-    setIsDrawing(false);
-  }
+    const col = Math.floor((clientX - rect.left) / pixelSize);
+    const row = Math.floor((clientY - rect.top) / pixelSize);
 
-  const handleTouchStart = (x: number, y: number) => {
-    setIsDrawing(true);
-    handleClick(x, y);
-  }
+    if (row < 0 || row >= size || col < 0 || col >= size) return null;
+    return { row, col };
+  };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDrawing) return;
-    // Only handle if there are actual touches
-    if (!e.touches || e.touches.length === 0) return;
-    
-    const touch = e.touches[0];
-    if (!touch) return;
-    
-    const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (!target) return;
-    
-    const pixelElement = target.closest('[data-pixel]');
-    if (pixelElement) {
-      const rowIndex = parseInt(pixelElement.getAttribute('data-row') || '0');
-      const cellIndex = parseInt(pixelElement.getAttribute('data-cell') || '0');
-      handleClick(rowIndex, cellIndex);
+  const handlePointerDown = (e: React.MouseEvent | React.TouchEvent) => {
+    const pixel = getPixelFromEvent(e);
+    if (!pixel) return;
+
+    isDrawingRef.current = true;
+    prevPixelRef.current = pixel;
+
+    // Paint single pixel
+    setPixels((prev) => {
+      const next = prev.map((r) => [...r]);
+      next[pixel.row][pixel.col] = colorRef.current;
+      return next;
+    });
+  };
+
+  const handlePointerMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawingRef.current) return;
+
+    const pixel = getPixelFromEvent(e);
+    if (!pixel) return;
+
+    const prev = prevPixelRef.current;
+    if (prev) {
+      drawLine(prev.row, prev.col, pixel.row, pixel.col, colorRef.current);
     }
-  }
+    prevPixelRef.current = pixel;
+  };
 
-  const handleTouchEnd = () => {
-    setIsDrawing(false);
-  }
+  const handlePointerUp = () => {
+    isDrawingRef.current = false;
+    prevPixelRef.current = null;
+  };
 
   const handleClear = () => {
-    if (!hasContent) {
-      // Already empty, no need to confirm
-      return;
-    }
-
-    const confirmed = window.confirm("Are you sure you want to clear the canvas? This action cannot be undone.");
-    
-    if (confirmed) {
+    if (!hasContent) return;
+    if (window.confirm("Clear the canvas?")) {
       setPixels(Array.from({ length: size }, () => Array<string>(size).fill("#ffffff")));
     }
-  }
+  };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 w-full px-8">
-      {/* 32x32 grid consitsting of divs that display the corresponding pixel color in the pixels array*/}
-      <div 
-        className="flex justify-center lg:justify-start overflow-auto pb-4 lg:pb-0 cursor-crosshair"
-        style={{ touchAction: 'none' }}
-        onMouseUp={handleMouseUp} 
-        onMouseLeave={handleMouseUp}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
-      > 
-        <div className="inline-block">
-          {pixels.map((row: string[], rowIndex: number) => (
-            <div key={rowIndex} className="flex"> 
-              {row.map((pixelColor: string, cellIndex: number) => (
-                <div
-                  key={cellIndex}
-                  data-pixel
-                  data-row={rowIndex}
-                  data-cell={cellIndex}
-                  className={`w-4 h-4 sm:w-4 sm:h-4${border ? " border-t border-l border-black" : ""}`}
-                  style={{ backgroundColor: pixelColor }}
-                  onMouseDown={() => handleMouseDown(rowIndex, cellIndex)}
-                  onMouseEnter={() => handleMouseEnter(rowIndex, cellIndex)}
-                  onTouchStart={() => handleTouchStart(rowIndex, cellIndex)}
-                />
-              ))}
-            </div>
-          ))}
-        </div> 
+    <div className="flex flex-col gap-4 p-4">
+      {/* Description input */}
+      <div className="flex items-center gap-2">
+        <textarea
+          ref={textareaRef}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="What are you creating today?"
+          rows={1}
+          className="flex-1 bg-transparent text-neutral-100 placeholder-neutral-600 outline-none resize-none py-2"
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={submitMutation.isPending}
+          className="text-sm text-neutral-400 hover:text-neutral-200 disabled:text-neutral-600 transition-colors"
+        >
+          {submitMutation.isPending ? "Submitting..." : "Submit →"}
+        </button>
       </div>
-      
-      {/* Color picker */}
-      <div className="flex flex-col gap-4 w-full lg:w-64 shrink-0">
-        <div className="flex flex-col gap-2">
-          <div className="rounded-md border border-neutral-700 bg-neutral-800/40 p-2 sm:p-3">
-            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-              <div 
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded border-2 border-neutral-600 flex-shrink-0"
-                style={{ backgroundColor: color }}
+
+      {/* Canvas with toolbar */}
+      <div className="flex flex-col sm:flex-row justify-center items-center sm:items-start gap-4">
+        {/* Pixel Grid */}
+        <div
+          ref={gridRef}
+          className="cursor-crosshair select-none rounded-lg overflow-hidden bg-white"
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${size}, ${pixelSize}px)`,
+            gridTemplateRows: `repeat(${size}, ${pixelSize}px)`,
+            touchAction: "none",
+          }}
+          onMouseDown={handlePointerDown}
+          onMouseMove={handlePointerMove}
+          onMouseUp={handlePointerUp}
+          onMouseLeave={handlePointerUp}
+          onTouchStart={handlePointerDown}
+          onTouchMove={handlePointerMove}
+          onTouchEnd={handlePointerUp}
+        >
+          {pixels.map((row, rowIdx) =>
+            row.map((pixelColor, colIdx) => (
+              <Pixel
+                key={`${rowIdx}-${colIdx}`}
+                color={pixelColor}
+                size={pixelSize}
+                showGrid={showGrid}
               />
-              <div className="flex-1 min-w-0">
-                <div className="text-xs text-neutral-400 mb-1">Selected Color</div>
-                <div className="text-xs sm:text-sm text-neutral-200 font-mono truncate">{color.toUpperCase()}</div>
-              </div>
-            </div>
-            <div className="w-full">
-              <HexColorPicker 
-                color={color} 
-                onChange={setColor}
-                style={{ width: '100%', height: '150px' }}
-              />
-            </div>
+            ))
+          )}
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex flex-row sm:flex-col gap-2">
+          <div className="relative">
+            <button
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              className="w-10 h-10 rounded-lg border-2 border-neutral-600 hover:border-neutral-500"
+              style={{ backgroundColor: color }}
+              title="Pick color"
+            />
+            {showColorPicker && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowColorPicker(false)} />
+                <div className="absolute left-0 sm:right-12 sm:left-auto top-12 sm:top-0 z-50 p-3 rounded-xl bg-neutral-800 border border-neutral-700 shadow-xl">
+                  <HexColorPicker color={color} onChange={setColor} style={{ width: 180, height: 180 }} />
+                  <input
+                    type="text"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    className="mt-2 w-full px-2 py-1 rounded bg-neutral-700 text-neutral-200 text-sm font-mono text-center uppercase"
+                  />
+                </div>
+              </>
+            )}
           </div>
-        </div>
-        {/*Description input */}
-        <div className="flex flex-col gap-2">
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Write a description for your pixel art..."
-            rows={3}
-            className="w-full rounded-md border border-neutral-700 bg-neutral-800/40 px-3 py-2 text-sm sm:text-base text-neutral-100 placeholder-neutral-500 outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 resize-none"
-          />
-        </div>
-        {/*toggle border */}
-        <div className="flex flex-row gap-2">
-          <button 
-            onClick={() => setBorder(!border)}
-            className="p-2 sm:p-3 rounded-md bg-neutral-800 hover:bg-neutral-700 active:bg-neutral-600 transition-colors touch-manipulation"
-            title="Toggle border"
-            aria-label="Toggle border"
+
+          <button
+            onClick={() => setShowGrid(!showGrid)}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center ${showGrid ? "bg-neutral-700 border border-neutral-600" : "bg-neutral-800 hover:bg-neutral-700"
+              }`}
+            title="Toggle grid"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              className="text-neutral-200 sm:w-6 sm:h-6"
-            >
-              <path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/>
-            </svg>
+            <Grid3x3 className="w-5 h-5 text-neutral-200" />
           </button>
 
-          {/*clear canvas */}
-          <button 
+          <button
             onClick={handleClear}
-            className="p-2 sm:p-3 rounded-md bg-neutral-800 hover:bg-red-900/50 active:bg-red-900/70 transition-colors touch-manipulation"
-            title="Clear canvas"
-            aria-label="Clear canvas"
+            className="w-10 h-10 rounded-lg bg-neutral-800 hover:bg-red-900/50 flex items-center justify-center"
+            title="Clear"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              className="text-neutral-200 sm:w-6 sm:h-6"
-            >
-              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14zM10 11v6M14 11v6"/>
-            </svg>
-          </button>
-
-          {/*submit button */}
-          <button onClick={handleSubmit} className="px-3 sm:px-4 py-2 sm:py-3 rounded-md bg-neutral-700 hover:bg-neutral-600 active:bg-neutral-500 text-neutral-100 font-medium text-sm sm:text-base transition-colors flex-1 touch-manipulation">
-            {submitMutation.isPending? 'Submitting...':"Submit"}
+            <Trash2 className="w-5 h-5 text-neutral-200" />
           </button>
         </div>
       </div>
-      
-
     </div>
   );
 }
