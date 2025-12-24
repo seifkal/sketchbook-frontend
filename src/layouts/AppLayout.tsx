@@ -5,8 +5,6 @@ import MobileNavbar from "../components/MobileNavbar";
 import Sidebar from "../components/Sidebar";
 
 export default function AppLayout() {
-    const location = useLocation();
-    const isCreatePage = location.pathname === "/create";
 
     return (
         <div className="bg-neutral-900 text-neutral-100 min-h-screen pb-16">
@@ -17,14 +15,12 @@ export default function AppLayout() {
                 <div className="hidden sm:flex w-1/3 min-w-[200px] border-r border-neutral-800 flex-col items-center px-4 gap-8">
                     <Navbar />
                 </div>
-                <div className={`w-full ${isCreatePage ? 'sm:w-4/5' : 'sm:w-3/5'} overflow-auto`}>
+                <div className={`w-full sm:w-3/5 overflow-auto`}>
                     <Outlet />
                 </div>
-                {!isCreatePage && (
-                    <div className="hidden sm:block w-1/3 min-w-[200px] border-l border-neutral-800 px-4 py-4">
-                        <Sidebar />
-                    </div>
-                )}
+                <div className="hidden sm:block w-1/3 min-w-[200px] border-l border-neutral-800 px-4 py-4">
+                    <Sidebar />
+                </div>
             </div>
             <MobileNavbar />
         </div>
