@@ -43,7 +43,7 @@ export default function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [showAvatarMenu, setShowAvatarMenu] = useState(false);
-    const [selectedVariant, setSelectedVariant] = useState<AvatarVariant>("beam");
+    const [selectedVariant, setSelectedVariant] = useState<typeof AVATAR_VARIANTS[number]>("beam");
     const [colors, setColors] = useState<string[]>(DEFAULT_COLORS);
     const [avatarName, setAvatarName] = useState("user"); // debounced name for avatar
     const menuRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ export default function Register() {
         const timer = setTimeout(() => {
             setAvatarName(username || "user");
             if (!hasToasted.current && username !== initialUsername.current) {
-                toast.info("Your avatar is generated from your username!", { position: "top-right" });
+                toast.info("Your avatar is generated from your username!", { position: "top-right", type: "info" });
                 hasToasted.current = true;
             }
         }, 500);
@@ -109,12 +109,12 @@ export default function Register() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full justify-center items-center relative overflow-hidden">
+        <div className="flex flex-col h-full w-full justify-center items-center relative overflow-hidden bg-neutral-100">
             <div className="w-full max-w-md p-8 z-10 mx-4">
                 <div className="text-center mb-10">
-                    <img src="/logo-text.svg" alt="Sketchbook" className="h-8 mx-auto mb-6" />
-                    <h2 className="text-2xl font-bold text-white mb-2">Create Account</h2>
-                    <p className="text-neutral-400">Join the creative community</p>
+                    <img src="/logo-text-dark.svg" alt="Sketchbook" className="h-8 mx-auto mb-6" />
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
+                    <p className="text-gray-500">Join the creative community</p>
                 </div>
 
                 {/* Avatar Preview with Click Menu */}
@@ -228,7 +228,7 @@ export default function Register() {
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full px-5 py-3.5 bg-neutral-800/50 border border-neutral-700 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all duration-200 placeholder-neutral-500 text-white"
+                                className="w-full px-5 py-3.5 bg-neutral-700 border border-gray-200 rounded-xl outline-none transition-all duration-200 placeholder-neutral-450 text-white caret-white"
                                 placeholder="Username"
                                 autoComplete="username"
                                 required
@@ -240,7 +240,7 @@ export default function Register() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-5 py-3.5 bg-neutral-800/50 border border-neutral-700 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all duration-200 placeholder-neutral-500 text-white"
+                                className="w-full px-5 py-3.5 bg-neutral-700 border border-gray-200 rounded-xl outline-none transition-all duration-200 placeholder-neutral-450 text-white caret-white"
                                 placeholder="Email address"
                                 autoComplete="email"
                                 required
@@ -252,7 +252,7 @@ export default function Register() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-5 py-3.5 bg-neutral-800/50 border border-neutral-700 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all duration-200 placeholder-neutral-500 text-white"
+                                className="w-full px-5 py-3.5 bg-neutral-700 border border-gray-200 rounded-xl outline-none transition-all duration-200 placeholder-neutral-450 text-white caret-white"
                                 placeholder="Password"
                                 autoComplete="new-password"
                                 required
@@ -264,7 +264,7 @@ export default function Register() {
                                 type="password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full px-5 py-3.5 bg-neutral-800/50 border border-neutral-700 rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all duration-200 placeholder-neutral-500 text-white"
+                                className="w-full px-5 py-3.5 bg-neutral-700 border border-gray-200 rounded-xl outline-none transition-all duration-200 placeholder-neutral-450 text-white caret-white"
                                 placeholder="Confirm password"
                                 autoComplete="new-password"
                                 required
@@ -274,16 +274,16 @@ export default function Register() {
 
                     <button
                         type="submit"
-                        className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200 bg-white text-black hover:bg-neutral-200 cursor-pointer shadow-lg shadow-white/5 active:scale-[0.98]"
+                        className="w-full py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200 bg-black border-1 text-white hover:bg-neutral-100 hover:text-black hover:border-black hover:shadow-lg hover:shadow-violet-500/25 active:scale-[0.98] cursor-pointer"
                     >
                         Create Account
                     </button>
                 </form>
 
                 <div className="mt-8 text-center">
-                    <p className="text-sm text-neutral-500">
+                    <p className="text-sm text-gray-500">
                         Already have an account?{' '}
-                        <Link to="/auth/login" className="text-white hover:text-neutral-300 font-medium transition-colors">
+                        <Link to="/auth/login" className="text-violet-500 hover:text-violet-400 font-medium transition-colors">
                             Sign in
                         </Link>
                     </p>
