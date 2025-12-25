@@ -22,7 +22,7 @@ export function useNavItems() {
             )
         },
         {
-            to: user?.userId ? `/users/${user.userId}` : "/auth/login", label: "Profile", icon: (
+            to: user?.id ? `/users/${user.id}` : "/auth/login", label: "Profile", icon: (
                 <User />
             )
         },

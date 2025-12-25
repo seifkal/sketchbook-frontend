@@ -110,7 +110,7 @@ export default function Profile() {
     }
 
     // compare logged in user id with url param id
-    const isOwnProfile = id === String(userClaims.userId);
+    const isOwnProfile = id === String(userClaims.id);
     console.log(isOwnProfile);
     console.log(user);
     // Format the join date

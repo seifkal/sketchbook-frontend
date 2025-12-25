@@ -2,12 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
 
 export default function Settings() {
-    const { setUser } = useUser();
+    const { logout } = useUser();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        setUser(null);
+    const handleLogout = async () => {
+        await logout();
         navigate("/auth");
     }
 

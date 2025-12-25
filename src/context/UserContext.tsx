@@ -1,41 +1,61 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { api } from "../api/axios";
 
-export interface JwtPayload {
-    userId: number;
+export interface User {
+    id: number;
     username: string;
     avatarColors?: string[];
     avatarVariant?: "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus";
 }
 
 interface UserContextType {
-    user: JwtPayload | null;
-    setUser: React.Dispatch<React.SetStateAction<JwtPayload | null>>;
+    user: User | null;
+    setUser: React.Dispatch<React.SetStateAction<User | null>>;
     isLoading: boolean;
+    isAuthenticated: boolean;
+    login: () => Promise<void>;
+    logout: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user, setUser] = useState<JwtPayload | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            try {
-                const decoded: JwtPayload = jwtDecode(token);
-                setUser(decoded);
-            } catch (err) {
-                console.error("Failed to decode JWT", err);
-                setUser(null);
-            }
+    const fetchCurrentUser = useCallback(async () => {
+        try {
+            const response = await api.get("/users/me");
+            setUser(response.data);
+        } catch {
+            setUser(null);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, []);
 
+    // Fetch user on initial load
+    useEffect(() => {
+        fetchCurrentUser();
+    }, [fetchCurrentUser]);
+
+    const login = useCallback(async () => {
+        setIsLoading(true);
+        await fetchCurrentUser();
+    }, [fetchCurrentUser]);
+
+    const logout = useCallback(async () => {
+        try {
+            await api.post("/auth/logout");
+        } finally {
+            setUser(null);
+        }
+    }, []);
+
+    const isAuthenticated = user !== null;
+
     return (
-        <UserContext.Provider value={{ user, setUser, isLoading }}>
+        <UserContext.Provider value={{ user, setUser, isLoading, isAuthenticated, login, logout }}>
             {children}
         </UserContext.Provider>
     );
@@ -50,4 +70,3 @@ export const useUser = (): UserContextType => {
 };
 
 export default UserContext;
-

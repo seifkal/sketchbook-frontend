@@ -2,8 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { api } from "../../api/axios";
 import { useState, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { useUser, type JwtPayload } from "../../context/UserContext";
-import { jwtDecode } from "jwt-decode";
+import { useUser } from "../../context/UserContext";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -12,18 +11,16 @@ export default function Login() {
     const emailRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
-    const { setUser } = useUser();
+    const { login } = useUser();
 
     const loginMutation = useMutation({
         mutationFn: async (credentials: { email: string; password: string }) => {
             const res = await api.post("/auth/login", credentials);
             return res.data;
         },
-        onSuccess: (data) => {
-            localStorage.setItem("token", data.token);
-            // Decode the token and update the user context
-            const decoded = jwtDecode<JwtPayload>(data.token);
-            setUser(decoded);
+        onSuccess: async () => {
+            // Fetch user data after successful login (cookie is now set)
+            await login();
             navigate("/");
         },
         onError: (error: unknown) => {

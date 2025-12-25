@@ -22,7 +22,7 @@ function App() {
 
   const userClaims = userContext?.user;
 
-  const id = userClaims?.userId.toString();
+  const id = userClaims?.id?.toString();
 
   return (
     <>

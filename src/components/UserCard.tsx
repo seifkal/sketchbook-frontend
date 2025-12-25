@@ -21,7 +21,7 @@ export default function UserCard({ user }: UserCardProps) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const userContext = useContext(UserContext);
-    const currentUserId = userContext?.user?.userId;
+    const currentUserId = userContext?.user?.id;
 
     const [isFollowing, setIsFollowing] = useState(user.isFollowing);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);

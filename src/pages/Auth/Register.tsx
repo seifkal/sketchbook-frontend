@@ -3,8 +3,7 @@ import Avatar from "boring-avatars";
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api/axios";
-import { useUser, type JwtPayload } from "../../context/UserContext";
-import { jwtDecode } from "jwt-decode";
+import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
 
 /*
@@ -47,7 +46,7 @@ export default function Register() {
     const [colors, setColors] = useState<string[]>(DEFAULT_COLORS);
     const [avatarName, setAvatarName] = useState("user"); // debounced name for avatar
     const menuRef = useRef<HTMLDivElement>(null);
-    const { setUser } = useUser();
+    const { login } = useUser();
     const navigate = useNavigate();
     const hasToasted = useRef(false);
     const initialUsername = useRef(username);
@@ -64,10 +63,9 @@ export default function Register() {
             });
             return response.data;
         },
-        onSuccess: (data) => {
-            localStorage.setItem("token", data.token);
-            const decoded = jwtDecode<JwtPayload>(data.token);
-            setUser(decoded);
+        onSuccess: async () => {
+            // Fetch user data after successful registration (cookie is now set)
+            await login();
             navigate("/");
         },
     });
