@@ -15,8 +15,22 @@ export interface Post {
     commentCount: number;
 }
 
-export default function PostList({ posts }: { posts: Post[] }) {
-    console.log(posts);
+interface PostListProps {
+    posts: Post[];
+    isLoading?: boolean;
+}
+
+export default function PostList({ posts, isLoading = false }: PostListProps) {
+    if (isLoading) {
+        return (
+            <div className="bg-neutral-900 w-full h-full">
+                {[...Array(3)].map((_, i) => (
+                    <PostCard key={i} isLoading />
+                ))}
+            </div>
+        );
+    }
+
     return (
         <div className="bg-neutral-900 w-full h-full">
             {posts.map((post: Post) => (

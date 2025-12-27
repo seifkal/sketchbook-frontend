@@ -4,6 +4,8 @@ import { api } from "../api/axios";
 import Avatar from "boring-avatars";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export interface SidebarUser {
     id: string;
@@ -14,23 +16,24 @@ export interface SidebarUser {
 }
 
 interface UserCardProps {
-    user: SidebarUser;
+    user?: SidebarUser;
+    isLoading?: boolean;
 }
 
-export default function UserCard({ user }: UserCardProps) {
+export default function UserCard({ user, isLoading = false }: UserCardProps) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const userContext = useContext(UserContext);
     const currentUserId = userContext?.user?.id;
 
-    const [isFollowing, setIsFollowing] = useState(user.isFollowing);
+    const [isFollowing, setIsFollowing] = useState(user?.isFollowing ?? false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const isOwnProfile = String(user.id) === String(currentUserId);
+    const isOwnProfile = String(user?.id) === String(currentUserId);
 
     const followMutation = useMutation({
         mutationFn: async () => {
-            const res = await api.post(`/follow/${user.id}`);
+            const res = await api.post(`/follow/${user?.id}`);
             return res.data;
         },
         onSuccess: () => {
@@ -41,7 +44,7 @@ export default function UserCard({ user }: UserCardProps) {
 
     const unfollowMutation = useMutation({
         mutationFn: async () => {
-            const res = await api.delete(`/follow/${user.id}`);
+            const res = await api.delete(`/follow/${user?.id}`);
             return res.data;
         },
         onSuccess: () => {
@@ -51,6 +54,8 @@ export default function UserCard({ user }: UserCardProps) {
 
     const handleFollow = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent navigation when clicking the button
+
+        if (isLoading) return;
 
         // Toggle UI immediately (optimistic update)
         const newState = !isFollowing;
@@ -72,26 +77,38 @@ export default function UserCard({ user }: UserCardProps) {
     };
 
     const handleCardClick = () => {
-        navigate(`/users/${user.id}`);
+        if (!isLoading && user) {
+            navigate(`/users/${user.id}`);
+        }
     };
 
     return (
         <div
             onClick={handleCardClick}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-800 transition-colors cursor-pointer"
+            className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${!isLoading ? 'hover:bg-neutral-800 cursor-pointer animate-[fadeIn_0.5s_ease-in-out]' : ''}`}
         >
-            <Avatar
-                name={user.Username}
-                colors={user.avatarColors}
-                variant={user.avatarVariant as "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus"}
-                size={40}
-            />
+            {isLoading ? (
+                <Skeleton circle width={40} height={40} baseColor="#262626" highlightColor="#404040" />
+            ) : (
+                <Avatar
+                    name={user?.Username}
+                    colors={user?.avatarColors}
+                    variant={user?.avatarVariant as "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus"}
+                    size={40}
+                />
+            )}
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-neutral-100 truncate">
-                    @{user.Username}
-                </p>
+                {isLoading ? (
+                    <Skeleton width={80} height={14} baseColor="#262626" highlightColor="#404040" />
+                ) : (
+                    <p className="text-sm font-semibold text-neutral-100 truncate">
+                        @{user?.Username}
+                    </p>
+                )}
             </div>
-            {!isOwnProfile ? (
+            {isLoading ? (
+                <Skeleton width={80} height={28} borderRadius={9999} baseColor="#262626" highlightColor="#404040" />
+            ) : !isOwnProfile ? (
                 <button
                     onClick={handleFollow}
                     className={`w-20 py-1 rounded-full text-xs font-bold transition-colors cursor-pointer ${isFollowing

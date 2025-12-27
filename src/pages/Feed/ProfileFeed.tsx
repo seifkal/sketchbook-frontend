@@ -20,13 +20,9 @@ export default function ProfileFeed({ id }: { id: string | undefined }) {
         enabled: !!id, // Only run query if id exists
     });
 
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
-
     if (error) {
         return <div>Error: {error.message}</div>
     }
 
-    return <PostList posts={posts ?? []} />
+    return <PostList posts={posts ?? []} isLoading={isLoading} />
 }   

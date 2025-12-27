@@ -20,13 +20,9 @@ export default function HomeFeed() {
         queryFn: getPosts,
     });
 
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
-
     if (error) {
         return <div>Error: {error.message}</div>
     }
 
-    return <PostList posts={posts ?? []} />
+    return <PostList posts={posts ?? []} isLoading={isLoading} />
 }

@@ -21,13 +21,9 @@ export default function LikesFeed({ id }: { id: string | undefined }) {
         enabled: !!id,
     });
 
-    if (isLoading) {
-        return <div>Loading...</div>
-    }
-
     if (error) {
         return <div>Error: {error.message}</div>
     }
 
-    return <PostList posts={posts ?? []} />
+    return <PostList posts={posts ?? []} isLoading={isLoading} />
 }

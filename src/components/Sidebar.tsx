@@ -36,7 +36,9 @@ export default function Sidebar() {
                 </h3>
                 <div className="flex flex-col gap-1">
                     {isRecentLoading ? (
-                        <div className="text-neutral-500 text-sm py-2">Loading...</div>
+                        [...Array(3)].map((_, i) => (
+                            <UserCard key={i} isLoading />
+                        ))
                     ) : recentError ? (
                         <div className="text-red-400 text-sm py-2">Failed to load users</div>
                     ) : recentUsers && recentUsers.length > 0 ? (
@@ -56,7 +58,9 @@ export default function Sidebar() {
                 </h3>
                 <div className="flex flex-col gap-1">
                     {isPopularLoading ? (
-                        <div className="text-neutral-500 text-sm py-2">Loading...</div>
+                        [...Array(3)].map((_, i) => (
+                            <UserCard key={i} isLoading />
+                        ))
                     ) : popularError ? (
                         <div className="text-red-400 text-sm py-2">Failed to load users</div>
                     ) : popularUsers && popularUsers.length > 0 ? (
