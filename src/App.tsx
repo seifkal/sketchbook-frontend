@@ -8,6 +8,7 @@ import AppLayout from "./layouts/AppLayout";
 import PixelDrawer from "./pages/Create/PixelDrawer";
 import { ToastContainer } from "react-toastify";
 import Settings from "./pages/Settings/Settings";
+import EditProfile from "./pages/Settings/EditProfile";
 import Profile from "./pages/Users/Profile";
 import LikesFeed from "./pages/Feed/LikesFeed";
 import { useContext } from "react";
@@ -63,6 +64,7 @@ function App() {
                 <Route index element={<Home />} />
                 <Route path="create" element={<PixelDrawer />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="settings/edit-profile" element={<EditProfile />} />
                 <Route path="users/:id" element={<Profile />} />
                 <Route path="likes" element={<LikesFeed id={id} />} />
                 <Route path="posts/:id" element={<PostPage />} />

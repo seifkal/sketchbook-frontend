@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import { api } from "../api/axios";
 
 export interface User {
-    id: number;
-    username: string;
+    id: string;
+    Username: string;
+    email?: string;
     avatarColors?: string[];
     avatarVariant?: "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus";
 }
@@ -47,6 +48,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const logout = useCallback(async () => {
         try {
             await api.post("/auth/logout");
+        } catch {
+            // Ignore logout errors
         } finally {
             setUser(null);
         }

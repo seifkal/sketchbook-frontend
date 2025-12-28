@@ -145,7 +145,10 @@ export default function Profile() {
                     <Avatar name={user.Username} colors={user.avatarColors} variant={user.avatarVariant} size={180} />
 
                     {isOwnProfile ? (
-                        <button className="px-4 py-1.5 rounded-full border border-neutral-600 text-neutral-200 text-sm font-semibold hover:bg-neutral-800 transition-colors cursor-pointer">
+                        <button
+                            onClick={() => navigate("/settings/edit-profile")}
+                            className="px-4 py-1.5 rounded-full border border-neutral-600 text-neutral-200 text-sm font-semibold hover:bg-neutral-800 transition-colors cursor-pointer"
+                        >
                             Edit profile
                         </button>
                     ) : (
