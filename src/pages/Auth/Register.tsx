@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api/axios";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
+import { AVATAR_VARIANTS, type AvatarVariant, DEFAULT_COLORS, generateRandomPalette } from "../../components/AvatarCustomizer";
 
 /*
 *
@@ -12,27 +13,6 @@ import { toast } from "react-toastify";
 * it generates unique avatars based on the name of the user
 * 
 */
-
-// types of avatars
-const AVATAR_VARIANTS = ["marble", "beam", "pixel", "sunset", "ring", "bauhaus"] as const;
-
-// default colors for avatar
-const DEFAULT_COLORS = ["#FF3366", "#6C5CE7", "#00D9FF", "#00E676", "#FF9F1C"];
-
-// generate random hex color
-const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
-
-// generate random palette
-const generateRandomPalette = () => {
-    return Array.from({ length: 5 }, () => getRandomColor());
-};
 
 
 export default function Register() {
@@ -42,7 +22,7 @@ export default function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [showAvatarMenu, setShowAvatarMenu] = useState(false);
-    const [selectedVariant, setSelectedVariant] = useState<typeof AVATAR_VARIANTS[number]>("beam");
+    const [selectedVariant, setSelectedVariant] = useState<AvatarVariant>("beam");
     const [colors, setColors] = useState<string[]>(DEFAULT_COLORS);
     const [avatarName, setAvatarName] = useState("user"); // debounced name for avatar
     const menuRef = useRef<HTMLDivElement>(null);
