@@ -1,62 +1,74 @@
 @import "tailwindcss";
 
 @theme {
-  --color-neutral-900: #121212;
-  --font-pixeled: 'Pixeled', sans-serif;
+  /* Colors */
+  --color-bg-primary: #0a0a12;
+  --color-bg-secondary: #12121f;
+  --color-bg-hover: #242438;
+
+  --color-neon-pink: #F72585;
+
+  --color-surface-card: #16162a;
+  --color-surface-border: #2a2a4a;
+
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b5;
+  --color-text-muted: #606080;
 }
 
 html,
 body {
-  @apply bg-neutral-900 min-h-screen;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
 }
 
-@font-face {
-  font-family: 'Pixeled';
-  src: url('/fonts/Pixeled.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Daydream DEMO';
-  src: url('/fonts/Daydream DEMO.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'BoldPixels';
-  src: url('/fonts/boldpixels.boldpixels.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@keyframes rainbowShift {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
+/* Pixel art rendering */
 .image-render-pixel {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
-@keyframes fadeIn {
+/* Heart pulse animation - used in PostCard */
+@keyframes heartPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.3);
+  }
+
+  50% {
+    transform: scale(1);
+  }
+
+  75% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-heart-pulse {
+  animation: heartPulse 0.4s ease-out;
+}
+
+/* Post fade-in animation */
+@keyframes postFadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.animate-post-fade-in {
+  animation: postFadeIn 0.4s ease-out forwards;
 }

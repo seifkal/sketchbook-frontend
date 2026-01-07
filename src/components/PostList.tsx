@@ -23,8 +23,8 @@ interface PostListProps {
 export default function PostList({ posts, isLoading = false }: PostListProps) {
     if (isLoading) {
         return (
-            <div className="bg-neutral-900 w-full h-full">
-                {[...Array(3)].map((_, i) => (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
+                {[...Array(8)].map((_, i) => (
                     <PostCard key={i} isLoading />
                 ))}
             </div>
@@ -32,10 +32,10 @@ export default function PostList({ posts, isLoading = false }: PostListProps) {
     }
 
     return (
-        <div className="bg-neutral-900 w-full h-full">
-            {posts.map((post: Post) => (
-                <PostCard key={post.id} post={post} />
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(250px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
+            {posts.map((post: Post, index: number) => (
+                <PostCard key={post.id} post={post} index={index} />
             ))}
         </div>
-    )
+    );
 }

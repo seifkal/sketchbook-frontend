@@ -11,7 +11,7 @@ interface PageData {
     number: number;
 }
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 6;
 
 export default function HomeFeed() {
     const { ref, inView } = useInView();
