@@ -52,13 +52,13 @@ export default function LikesFeed({ id }: { id: string | undefined }) {
     const posts = data?.pages.flatMap((page) => page.content) ?? [];
 
     return (
-        <>
+        <div className="pt-6">
             <PostList posts={posts} isLoading={isLoading} />
             <div ref={ref} className="h-10 flex items-center justify-center">
                 {isFetchingNextPage && (
                     <div className="text-neutral-500 text-sm">Loading more...</div>
                 )}
             </div>
-        </>
+        </div>
     );
 }
