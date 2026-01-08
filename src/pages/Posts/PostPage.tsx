@@ -1,12 +1,13 @@
-import { useParams, Link, useLocation } from "react-router-dom";
+import { useParams, Link, useLocation, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/axios";
 import Avatar from "boring-avatars";
 import ReactTimeAgo from "react-time-ago";
-import { Heart, MessageCircle, ArrowLeft } from "lucide-react";
+import { Heart, MessageCircle, ArrowLeft, MoreVertical, X, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import type { Post, AvatarVariant } from "../../components/PostList";
+import { useUser } from "../../context/UserContext";
 
 interface Comment {
     id: string;
@@ -22,8 +23,12 @@ interface Comment {
 export default function PostPage() {
     const { id } = useParams<{ id: string }>();
     const location = useLocation();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { user } = useUser();
     const [commentText, setCommentText] = useState("");
+    const [showLightbox, setShowLightbox] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
     const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
     const commentFormRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -39,6 +44,9 @@ export default function PostPage() {
         },
         enabled: !!id,
     });
+
+    // Check if current user is the post author
+    const isOwner = user?.id === post?.authorId;
 
     // Local state for optimistic like updates
     const [toggleLike, setToggleLike] = useState(post?.liked ?? false);
@@ -88,6 +96,28 @@ export default function PostPage() {
         },
     });
 
+    // Delete mutation
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            await api.delete(`/posts/${id}`);
+        },
+        onSuccess: () => {
+            toast.success("Post deleted");
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
+            navigate("/");
+        },
+        onError: () => {
+            toast.error("Failed to delete post");
+        },
+    });
+
+    const handleDelete = () => {
+        if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+            deleteMutation.mutate();
+        }
+        setShowMenu(false);
+    };
+
     // Comment mutation
     const commentMutation = useMutation({
         mutationFn: async (content: string) => {
@@ -132,8 +162,29 @@ export default function PostPage() {
     }
 
     return (
-        <div className="bg-neutral-900 min-h-screen pb-20">
-            <div className="sticky top-0 bg-neutral-900 border-b border-neutral-800 p-4 flex items-center gap-4 z-10">
+        <div className="min-h-screen pb-20">
+            {/* Lightbox Modal */}
+            {showLightbox && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+                    onClick={() => setShowLightbox(false)}
+                >
+                    <button
+                        className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+                        onClick={() => setShowLightbox(false)}
+                    >
+                        <X size={28} />
+                    </button>
+                    <img
+                        src={IMAGE_BASE_URL + post.imageUrl}
+                        alt={post.title}
+                        className="max-w-full max-h-full object-contain image-render-pixel"
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
+
+            <div className="sticky top-0 border-b border-neutral-800 p-4 flex items-center gap-4 z-10">
                 <Link to="/" className="hover:bg-neutral-800 p-2 rounded-full transition-colors">
                     <ArrowLeft className="text-neutral-400" size={20} />
                 </Link>
@@ -143,34 +194,64 @@ export default function PostPage() {
             {/* Post Content */}
             <div className="max-w-2xl mx-auto p-6">
                 {/* Author Info */}
-                <div className="flex w-full gap-2">
-                    <Link to={`/users/${post.authorId}`} className="flex gap-2 items-center">
-                        <Avatar
-                            name={post.authorUsername}
-                            colors={post.authorAvatarColors}
-                            variant={post.authorAvatarVariant}
-                            size={40}
-                        />
-                        <div className="flex justify-center items-center">{post.authorUsername}</div>
-                    </Link>
-                    <ReactTimeAgo date={new Date(post.createdAt)} className="flex justify-center items-center text-neutral-500" />
+                <div className="flex w-full items-center justify-between">
+                    <div className="flex gap-2 items-center">
+                        <Link to={`/users/${post.authorId}`} className="flex gap-2 items-center">
+                            <Avatar
+                                name={post.authorUsername}
+                                colors={post.authorAvatarColors}
+                                variant={post.authorAvatarVariant}
+                                size={40}
+                            />
+                            <div className="flex justify-center items-center">{post.authorUsername}</div>
+                        </Link>
+                        <ReactTimeAgo date={new Date(post.createdAt)} className="flex justify-center items-center text-neutral-500" />
+                    </div>
+
+                    {/* Three dot menu for post owner */}
+                    {isOwner && (
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowMenu(!showMenu)}
+                                className="p-2 hover:bg-neutral-800 rounded-full transition-colors"
+                            >
+                                <MoreVertical className="text-neutral-400" size={20} />
+                            </button>
+                            {showMenu && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
+                                    <div className="absolute right-0 top-full mt-1 z-50 bg-neutral-800 border border-neutral-700 rounded-xl shadow-xl overflow-hidden min-w-[150px]">
+                                        <button
+                                            onClick={handleDelete}
+                                            disabled={deleteMutation.isPending}
+                                            className="w-full px-4 py-3 flex items-center gap-3 text-red-400 hover:bg-neutral-700 transition-colors text-left"
+                                        >
+                                            <Trash2 size={18} />
+                                            <span>{deleteMutation.isPending ? "Deleting..." : "Delete Post"}</span>
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Post Title */}
                 <div className="w-full flex py-4">{post.title}</div>
 
-                {/* Post Image */}
+                {/* Post Image - clickable for lightbox */}
                 <img
                     src={IMAGE_BASE_URL + post.imageUrl}
                     alt={post.title}
-                    className="w-full image-render-pixel rounded-3xl mb-4"
+                    className="w-full image-render-pixel rounded-3xl mb-4 cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setShowLightbox(true)}
                 />
 
                 {/* Post Buttons */}
                 <div className="flex items-center gap-6 mb-8 border-b border-neutral-800 pb-4">
                     <button
                         onClick={() => likeMutation.mutate()}
-                        className="flex items-center gap-2 hover:text-red-500 transition-colors"
+                        className="flex items-center gap-2 hover:text-red-500 transition-colors cursor-pointer"
                         disabled={likeMutation.isPending}
                     >
                         <Heart
