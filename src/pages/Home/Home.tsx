@@ -12,7 +12,7 @@ export default function Home() {
                 <button
                     onClick={() => setFeedType("recent")}
                     className={`cursor-pointer font-semibold transition-colors ${feedType === "recent"
-                        ? "text-text-primary border-b-2 border-neutral-400 pb-1"
+                        ? "text-text-primary border-b-2 border-orange-600 pb-1"
                         : "text-text-secondary hover:text-text-primary"
                         }`}
                 >
@@ -21,7 +21,7 @@ export default function Home() {
                 <button
                     onClick={() => setFeedType("following")}
                     className={`cursor-pointer font-semibold transition-colors ${feedType === "following"
-                        ? "text-text-primary border-b-2 border-neutral-400 pb-1"
+                        ? "text-text-primary border-b-2 border-orange-600 pb-1"
                         : "text-text-secondary hover:text-text-primary"
                         }`}
                 >
