@@ -35,7 +35,17 @@ const Pixel = memo(function Pixel({
 
 export default function PixelDrawer() {
   const size = 32;
-  const pixelSize = 14;
+
+  // Responsive pixel size - calculate based on available width
+  const getPixelSize = () => {
+    if (typeof window === 'undefined') return 18;
+    const availableWidth = window.innerWidth - 32; // account for padding
+    const maxCanvasWidth = availableWidth;
+    const calculatedSize = Math.floor(maxCanvasWidth / size);
+    return Math.min(Math.max(calculatedSize, 10), 18); // min 10px, max 18px
+  };
+
+  const [pixelSize, setPixelSize] = useState(getPixelSize);
 
   const [color, setColor] = useState("#000000");
   const [showGrid, setShowGrid] = useState(false);
@@ -55,6 +65,13 @@ export default function PixelDrawer() {
   useEffect(() => {
     colorRef.current = color;
   }, [color]);
+
+  // Update pixel size on window resize
+  useEffect(() => {
+    const handleResize = () => setPixelSize(getPixelSize());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [pixels, setPixels] = useState<string[][]>(() =>
     Array.from({ length: size }, () => Array<string>(size).fill("#ffffff"))
@@ -179,15 +196,16 @@ export default function PixelDrawer() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      {/* Description input */}
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center gap-4 p-4">
+      {/* Description input - matches canvas width */}
+      <div className="flex items-center gap-2 w-full" style={{ maxWidth: `${size * pixelSize}px` }}>
         <textarea
           ref={textareaRef}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="What are you creating today?"
           rows={1}
+          maxLength={100}
           className="flex-1 bg-transparent text-neutral-100 placeholder-neutral-600 outline-none resize-none py-2"
         />
         <button
@@ -200,7 +218,7 @@ export default function PixelDrawer() {
       </div>
 
       {/* Canvas with toolbar */}
-      <div className="flex flex-col sm:flex-row justify-center items-center sm:items-start gap-4">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
         {/* Pixel Grid */}
         <div
           ref={gridRef}
