@@ -52,7 +52,7 @@ export default function ProfileFeed({ id }: { id: string | undefined }) {
 
     return (
         <>
-            <PostList posts={posts} isLoading={isLoading} />
+            {posts?.length ? <PostList posts={posts} isLoading={isLoading} /> : <p className="flex items-center text-neutral-50 p-8">No posts found...</p>}
             <div ref={ref} className="h-10 flex items-center justify-center">
                 {isFetchingNextPage && (
                     <div className="text-neutral-500 text-sm">Loading more...</div>

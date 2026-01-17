@@ -124,9 +124,9 @@ export default function Profile() {
     console.log("user.isFollowing", user.isFollowing);
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen border-r-1 border-l-1 border-neutral-800">
             {/* Header */}
-            <div className="flex items-center border-b border-neutral-800 px-4 py-3 gap-4 sticky top-0 bg-neutral-900">
+            <div className="flex items-center border-b border-neutral-800 px-4 py-3 gap-4 sticky top-0">
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center hover:bg-neutral-800 p-2 rounded-full transition-colors"
