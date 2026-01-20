@@ -38,8 +38,6 @@ export default function PostCard({ post, isLoading = false, index = 0 }: PostCar
     const [isHovered, setIsHovered] = useState(false);
     const [isLikeAnimating, setIsLikeAnimating] = useState(false);
 
-    const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
-
     const likeMutation = useMutation({
         mutationFn: async () => {
             const res = await api.post(`/posts/${post?.id}/like`);
@@ -94,7 +92,7 @@ export default function PostCard({ post, isLoading = false, index = 0 }: PostCar
             {/* Image */}
             <div className="relative aspect-square overflow-hidden bg-bg-secondary">
                 <img
-                    src={IMAGE_BASE_URL + post.imageUrl}
+                    src={post.imageUrl}
                     alt={post.title}
                     className={`w-full h-full object-cover image-render-pixel transition-transform duration-300 ${isHovered ? "scale-105" : "scale-100"}`}
                 />

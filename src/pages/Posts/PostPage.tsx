@@ -29,7 +29,6 @@ export default function PostPage() {
     const [commentText, setCommentText] = useState("");
     const [showLightbox, setShowLightbox] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
-    const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
     const commentFormRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -176,7 +175,7 @@ export default function PostPage() {
                         <X size={28} />
                     </button>
                     <img
-                        src={IMAGE_BASE_URL + post.imageUrl}
+                        src={post.imageUrl}
                         alt={post.title}
                         className="max-w-full max-h-full object-contain image-render-pixel"
                         onClick={(e) => e.stopPropagation()}
@@ -241,7 +240,7 @@ export default function PostPage() {
 
                 {/* Post Image - clickable for lightbox */}
                 <img
-                    src={IMAGE_BASE_URL + post.imageUrl}
+                    src={post.imageUrl}
                     alt={post.title}
                     className="w-full image-render-pixel rounded-3xl mb-4 cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => setShowLightbox(true)}
