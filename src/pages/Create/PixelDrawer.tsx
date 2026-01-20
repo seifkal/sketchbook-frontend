@@ -4,7 +4,7 @@ import { HexColorPicker } from "react-colorful";
 import { api } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Grid3x3, Trash2 } from "lucide-react";
+import { Grid3x3, Trash2, PaintBucket, Pencil } from "lucide-react";
 
 interface postPayload {
   title: string;
@@ -51,6 +51,7 @@ export default function PixelDrawer() {
   const [showGrid, setShowGrid] = useState(false);
   const [description, setDescription] = useState("");
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [tool, setTool] = useState<'draw' | 'fill'>('draw');
 
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -130,6 +131,40 @@ export default function PixelDrawer() {
     });
   };
 
+  // Flood fill algorithm using BFS
+  const floodFill = (startRow: number, startCol: number, fillColor: string) => {
+    setPixels((prev) => {
+      const targetColor = prev[startRow][startCol];
+
+      // Don't fill if clicking on the same color
+      if (targetColor === fillColor) return prev;
+
+      const next = prev.map((r) => [...r]);
+      const queue: [number, number][] = [[startRow, startCol]];
+      const visited = new Set<string>();
+
+      while (queue.length > 0) {
+        const [row, col] = queue.shift()!;
+        const key = `${row},${col}`;
+
+        if (visited.has(key)) continue;
+        if (row < 0 || row >= size || col < 0 || col >= size) continue;
+        if (next[row][col] !== targetColor) continue;
+
+        visited.add(key);
+        next[row][col] = fillColor;
+
+        // Add adjacent pixels (4-directional)
+        queue.push([row - 1, col]); // up
+        queue.push([row + 1, col]); // down
+        queue.push([row, col - 1]); // left
+        queue.push([row, col + 1]); // right
+      }
+
+      return next;
+    });
+  };
+
   // Get pixel coordinates from mouse/touch position
   const getPixelFromEvent = (e: React.MouseEvent | React.TouchEvent) => {
     const grid = gridRef.current;
@@ -159,6 +194,13 @@ export default function PixelDrawer() {
     const pixel = getPixelFromEvent(e);
     if (!pixel) return;
 
+    if (tool === 'fill') {
+      // Flood fill at clicked position
+      floodFill(pixel.row, pixel.col, colorRef.current);
+      return;
+    }
+
+    // Draw mode
     isDrawingRef.current = true;
     prevPixelRef.current = pixel;
 
@@ -222,8 +264,9 @@ export default function PixelDrawer() {
         {/* Pixel Grid */}
         <div
           ref={gridRef}
-          className="cursor-crosshair select-none rounded-lg overflow-hidden bg-white"
+          className="select-none rounded-lg overflow-hidden bg-white"
           style={{
+            cursor: tool === 'fill' ? 'pointer' : 'crosshair',
             display: "grid",
             gridTemplateColumns: `repeat(${size}, ${pixelSize}px)`,
             gridTemplateRows: `repeat(${size}, ${pixelSize}px)`,
@@ -273,6 +316,24 @@ export default function PixelDrawer() {
               </>
             )}
           </div>
+
+          <button
+            onClick={() => setTool('draw')}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center ${tool === 'draw' ? "bg-neutral-700 border border-neutral-600" : "bg-neutral-800 hover:bg-neutral-700"
+              }`}
+            title="Draw tool"
+          >
+            <Pencil className="w-5 h-5 text-neutral-200" />
+          </button>
+
+          <button
+            onClick={() => setTool('fill')}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center ${tool === 'fill' ? "bg-neutral-700 border border-neutral-600" : "bg-neutral-800 hover:bg-neutral-700"
+              }`}
+            title="Fill tool"
+          >
+            <PaintBucket className="w-5 h-5 text-neutral-200" />
+          </button>
 
           <button
             onClick={() => setShowGrid(!showGrid)}
