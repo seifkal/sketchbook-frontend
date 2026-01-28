@@ -11,7 +11,7 @@ import LikesFeed from "../Feed/LikesFeed";
 interface User {
     id: string;
     Username: string;
-    avatarVariant: string;
+    avatarVariant: any;
     avatarColors: string[];
     followersCount: number;
     followingCount: number;
