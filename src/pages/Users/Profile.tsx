@@ -7,11 +7,12 @@ import { api } from "../../api/axios";
 import ProfileFeed from "../Feed/ProfileFeed";
 import Avatar from "boring-avatars";
 import LikesFeed from "../Feed/LikesFeed";
+import { DEFAULT_AVATAR_VARIANT, isAvatarVariant } from "../../utils/avatar";
 
 interface User {
     id: string;
     Username: string;
-    avatarVariant: any;
+    avatarVariant?: string;
     avatarColors: string[];
     followersCount: number;
     followingCount: number;
@@ -123,6 +124,8 @@ export default function Profile() {
 
     console.log("user.isFollowing", user.isFollowing);
 
+    const avatarVariant = isAvatarVariant(user.avatarVariant) ? user.avatarVariant : DEFAULT_AVATAR_VARIANT;
+
     return (
         <div className="flex flex-col min-h-screen border-r-1 border-l-1 border-neutral-800">
             {/* Header */}
@@ -142,7 +145,7 @@ export default function Profile() {
             <div className="border-b border-neutral-800 px-4 py-4">
                 {/* Avatar & Action Button Row */}
                 <div className="flex justify-between items-start mb-3">
-                    <Avatar name={user.Username} colors={user.avatarColors} variant={user.avatarVariant} size={180} />
+                    <Avatar name={user.Username} colors={user.avatarColors} variant={avatarVariant} size={180} />
 
                     {isOwnProfile ? (
                         <button

@@ -6,7 +6,8 @@ import ReactTimeAgo from "react-time-ago";
 import { Heart, MessageCircle, ArrowLeft, MoreVertical, X, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import type { Post, AvatarVariant } from "../../components/PostList";
+import type { Post } from "../../components/PostList";
+import type { AvatarVariant } from "../../utils/avatar";
 import { useUser } from "../../context/UserContext";
 
 interface Comment {

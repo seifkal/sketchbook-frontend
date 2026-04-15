@@ -5,7 +5,8 @@ import { api } from "../../api/axios";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
 import { ArrowLeft } from "lucide-react";
-import AvatarCustomizer, { type AvatarVariant, DEFAULT_COLORS } from "../../components/AvatarCustomizer";
+import AvatarCustomizer from "../../components/AvatarCustomizer";
+import { type AvatarVariant, DEFAULT_AVATAR_VARIANT, DEFAULT_COLORS } from "../../utils/avatar";
 
 export default function EditProfile() {
     const { user, login } = useUser();
@@ -19,7 +20,7 @@ export default function EditProfile() {
     const [error, setError] = useState("");
 
     // Avatar state
-    const [selectedVariant, setSelectedVariant] = useState<AvatarVariant>("beam");
+    const [selectedVariant, setSelectedVariant] = useState<AvatarVariant>(DEFAULT_AVATAR_VARIANT);
     const [colors, setColors] = useState<string[]>(DEFAULT_COLORS);
 
     // Sync form state with user data when it loads
@@ -27,7 +28,7 @@ export default function EditProfile() {
         if (user) {
             setUsername(user.Username || "");
             setEmail(user.email || "");
-            setSelectedVariant(user.avatarVariant || "beam");
+            setSelectedVariant(user.avatarVariant || DEFAULT_AVATAR_VARIANT);
             setColors(user.avatarColors || DEFAULT_COLORS);
         }
     }, [user]);

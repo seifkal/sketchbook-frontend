@@ -1,5 +1,5 @@
 import PostCard from "./PostCard";
-export type AvatarVariant = "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus" | undefined;
+import type { AvatarVariant } from "../utils/avatar";
 
 export interface Post {
     id: string;
@@ -8,7 +8,7 @@ export interface Post {
     authorId: string;
     authorUsername: string;
     createdAt: string;
-    authorAvatarVariant: AvatarVariant;
+    authorAvatarVariant?: AvatarVariant;
     authorAvatarColors: string[];
     likeCount: number;
     liked: boolean;

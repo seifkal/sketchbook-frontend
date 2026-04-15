@@ -1,25 +1,6 @@
 import Avatar from "boring-avatars";
 import { useState, useRef, useEffect } from "react";
-
-// Avatar utility types and constants
-export const AVATAR_VARIANTS = ["marble", "beam", "pixel", "sunset", "ring", "bauhaus"] as const;
-export type AvatarVariant = typeof AVATAR_VARIANTS[number];
-export const DEFAULT_COLORS = ["#FF3366", "#6C5CE7", "#00D9FF", "#00E676", "#FF9F1C"];
-
-// Generate random hex color
-const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-};
-
-// Generate random palette
-export const generateRandomPalette = () => {
-    return Array.from({ length: 5 }, () => getRandomColor());
-};
+import { AVATAR_VARIANTS, generateRandomPalette, type AvatarVariant } from "../utils/avatar";
 interface AvatarCustomizerProps {
     name: string;
     variant: AvatarVariant;

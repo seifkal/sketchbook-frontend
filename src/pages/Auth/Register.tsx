@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../../api/axios";
 import { useUser } from "../../context/UserContext";
 import { toast } from "react-toastify";
-import { AVATAR_VARIANTS, type AvatarVariant, DEFAULT_COLORS, generateRandomPalette } from "../../components/AvatarCustomizer";
+import { AVATAR_VARIANTS, type AvatarVariant, DEFAULT_AVATAR_VARIANT, DEFAULT_COLORS, generateRandomPalette } from "../../utils/avatar";
 
 /*
 *
@@ -22,7 +22,7 @@ export default function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [showAvatarMenu, setShowAvatarMenu] = useState(false);
-    const [selectedVariant, setSelectedVariant] = useState<AvatarVariant>("beam");
+    const [selectedVariant, setSelectedVariant] = useState<AvatarVariant>(DEFAULT_AVATAR_VARIANT);
     const [colors, setColors] = useState<string[]>(DEFAULT_COLORS);
     const [avatarName, setAvatarName] = useState("user"); // debounced name for avatar
     const menuRef = useRef<HTMLDivElement>(null);

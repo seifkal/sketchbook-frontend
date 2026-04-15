@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { api } from "../api/axios";
+import type { AvatarVariant } from "../utils/avatar";
 
 export interface User {
     id: string;
     Username: string;
     email?: string;
     avatarColors?: string[];
-    avatarVariant?: "marble" | "beam" | "pixel" | "sunset" | "ring" | "bauhaus";
+    avatarVariant?: AvatarVariant;
 }
 
 interface UserContextType {
