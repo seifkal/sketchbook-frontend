@@ -35,8 +35,26 @@ export default function Login() {
         }
     });
 
+    const guestMutation = useMutation({
+        mutationFn: async () => {
+            const res = await api.post("/auth/guest");
+            return res.data;
+        },
+        onSuccess: async () => {
+            await login();
+            navigate("/");
+        },
+        onError: (error: unknown) => {
+            console.error("Guest login error:", error);
+            setError("Unable to continue as guest. Please try again.");
+        }
+    });
+
+    const isAuthenticating = loginMutation.isPending || guestMutation.isPending;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isAuthenticating) return;
         setError(""); // Clear any previous errors
         loginMutation.mutate({ email, password });
     }
@@ -88,8 +106,8 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        disabled={loginMutation.isPending}
-                        className={`w-full py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200 ${loginMutation.isPending
+                        disabled={isAuthenticating}
+                        className={`w-full py-3.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200 ${isAuthenticating
                             ? 'bg-neutral-600 text-gray-400 cursor-not-allowed'
                             : 'bg-black border-1 text-white hover:bg-neutral-100 hover:text-black hover:border-black hover:shadow-lg hover:shadow-violet-500/25 active:scale-[0.98] cursor-pointer'
                             }`}
@@ -107,9 +125,17 @@ export default function Login() {
                 <div className="mt-6">
                     <button
                         type="button"
-                        className="w-full py-3.5 px-4 rounded-xl font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-200 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                        disabled={isAuthenticating}
+                        onClick={() => {
+                            setError("");
+                            guestMutation.mutate();
+                        }}
+                        className={`w-full py-3.5 px-4 rounded-xl font-medium border transition-all duration-200 flex items-center justify-center gap-2 shadow-sm ${isAuthenticating
+                            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                            : 'text-gray-700 bg-white hover:bg-gray-50 border-gray-200 cursor-pointer'
+                            }`}
                     >
-                        <p>Continue as Guest</p>
+                        <p>{guestMutation.isPending ? 'Continuing...' : 'Continue as Guest'}</p>
                     </button>
                 </div>
 
