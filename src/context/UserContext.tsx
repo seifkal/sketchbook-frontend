@@ -6,6 +6,7 @@ export interface User {
     id: string;
     Username: string;
     email?: string;
+    role?: "USER" | "GUEST" | "ADMIN";
     avatarColors?: string[];
     avatarVariant?: AvatarVariant;
 }
